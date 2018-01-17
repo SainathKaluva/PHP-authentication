@@ -1,6 +1,6 @@
 <?php
 include_once 'config.php'; //For Database connection
-
+$error_msg = '';
 $firstname_err = $lastname_err = $email_err = $password_err = '';
 $firstname = $lastname = $email = $password = '';
 
@@ -26,4 +26,32 @@ if(isset($_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['passw
     } else {
     	$password_err = "Password must be atleast 8 characters long. Password must contain atleast one lowercase, uppercase and a number.";
     }
+
+    //Check if the email already exists in database
+    $stmt = $mysqli->prepare("SELECT acc_id FROM accounts WHERE email =?");
+    if($stmt) {
+    	$stmt->bind_param('s', $email);
+   	    $stmt->execute();
+   	    $stmt->store_result();
+   	    if($stmt->num_rows == 1) {
+   		   $error_msg .= '<p>This Email is already registered</p>';
+   		   $stmt->close();
+        }
+    } else {
+    	$error_msg .= '<p> Error in Database </p>';
+    	$stmt->close();
+    }
+    //Insert values into database
+    if(empty($error_msg)) {
+    	$password = password_hash($password, PASSWORD_BCRYPT); //Hashing Passwords
+    	$stmt = $mysqli->prepare("INSERT INTO accounts (firstname, lastname, email, password)VALUES (?, ?, ?, ?)");
+    	if ($stmt) {
+            $stmt->bind_param('ssss', $firstname, $lastname, $email, $password);
+            if (! $stmt->execute()) {
+           	    $error_msg .= '<p>Failed to store input data</p>';
+   	   	    }
+	   }
+       header('Location: ../reg.done.php');
+    }
 }
+
