@@ -48,7 +48,7 @@ if(isset($_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['passw
     	if ($stmt) {
             $stmt->bind_param('ssss', $firstname, $lastname, $email, $password);
             if (! $stmt->execute()) {
-           	    $error_msg .= '<p>Failed to store input data</p>';
+           	    header('Location: ../error.php?error=Failed to store input data');
    	   	    }
 	   }
        header('Location: ../reg.done.php');
