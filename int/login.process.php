@@ -14,7 +14,7 @@ if (isset($_POST['email'], $_POST['password'])) {
     }
 } else {
     // If wrong POST variables are received.
-   header('Location: ../error.php?error=invalid login request')
+   header('Location: ../error.php?error=invalid login request');
 }
 
 function login($email, $password, $mysqli) {
